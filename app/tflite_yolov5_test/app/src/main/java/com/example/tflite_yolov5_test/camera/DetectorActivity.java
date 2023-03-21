@@ -28,8 +28,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetectorActivity extends CameraActivity implements ImageReader.OnImageAvailableListener {
 
+// implements ImageReader.OnImageAvailableListener already implements in CameraActivity, so remove here
+// in CameraActivity, processImage() is a abstract function and is called in onImageAvailable, implete here
+public class DetectorActivity extends CameraActivity  {
+
+    private static final String TAG = "DetectorActivity";
 
     private static final int TF_OD_API_INPUT_SIZE = 320;
     private static final boolean TF_OD_API_IS_QUANTIZED = true;
@@ -77,6 +81,11 @@ public class DetectorActivity extends CameraActivity implements ImageReader.OnIm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = getIntent().getExtras();
+        TfliteRunMode.Mode inMODE = (TfliteRunMode.Mode)bundle.getSerializable("mode_type");
+        int inputSize = bundle.getInt("input_size");
+        Log.e(TAG,String.format("input size is %d",inputSize));
+        Log.e(TAG,String.format("MODE is %s",inMODE.toString()));
         SeekBar conf_seekBar = (SeekBar)findViewById(R.id.conf_seekBar2);
         conf_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
             @Override

@@ -41,6 +41,7 @@ import java.util.Map;
 import android.graphics.Bitmap;
 
 import java.lang.Math;
+import com.example.tflite_yolov5_test.TfliteRunMode.*;
 public class MainActivity extends AppCompatActivity {
 
     final int REQUEST_OPEN_FILE = 1;
@@ -340,12 +341,24 @@ public class MainActivity extends AppCompatActivity {
         ImageView imageview = (ImageView)findViewById(R.id.resultImageView);
         imageview.setImageBitmap(bitmap);
     }
+
+
     public void OnOpenCameraButtonClick(View view){
         if (isBackgroundTaskRunning()) {
             showErrorDialog("Please stop inference task");
             return;
         }
+        TfliteRunMode.Mode runmode = getRunModeFromGUI();
+        if (runmode == null) {
+            showErrorDialog("Please select valid configurations.");
+            return;
+        }
+
         Intent intent = new Intent(MainActivity.this, DetectorActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("input_size",getInputSizeFromGUI());
+        bundle.putSerializable("mode_type",runmode);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
     @Override
