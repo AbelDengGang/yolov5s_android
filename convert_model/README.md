@@ -7,13 +7,17 @@ For more information, please refer this article by the developer of `openvino2te
   
 ## Docker build
 ```sh
-git clone --recursive https://github.com/lp6m/yolov5s_android
+git clone --recursive git@github.com:AbelDengGang/yolov5s_android.git
 cd yolov5s_android
 docker build ./ -f ./docker/Dockerfile  -t yolov5s_android
 docker run -it --gpus all -v `pwd`:/workspace yolov5s_android bash
 ```
 The following process is performed in docker container.  
 
+If docker report can not find GPU, need install nvidia-container-toolkit
+```
+sudo apt-get install -y nvidia-container-toolkit
+```
 ## PyTorch -> ONNX
 Download the pytorch pretrained weights and export to ONNX format.  
 ```sh
