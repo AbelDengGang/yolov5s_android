@@ -5,9 +5,9 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update --fix-missing
 RUN apt-get install -y python3 python3-pip
 RUN pip3 install --upgrade pip
-RUN pip3 install tensorflow-gpu==2.4.0
-RUN pip3 install torch==1.7.0
-RUN pip3 install tensorflow-datasets
+RUN pip3 install tensorflow-gpu==2.4.0 -i https://pypi.douban.com/simple/
+RUN pip3 install torch==1.7.0 -i https://pypi.douban.com/simple/
+RUN pip3 install tensorflow-datasets -i https://pypi.douban.com/simple/
 
 # install openvino
 ENV http_proxy $HTTP_PROXY
@@ -28,23 +28,23 @@ RUN mkdir -p $TEMP_DIR && cd $TEMP_DIR && \
     sed -i 's/decline/accept/g' silent.cfg && \
     ./install.sh -s silent.cfg && \
     rm -rf $TEMP_DIR
-RUN pip3 install networkx
-RUN pip3 install defusedxml
+RUN pip3 install networkx -i https://pypi.douban.com/simple/
+RUN pip3 install defusedxml -i https://pypi.douban.com/simple/
 
 # install requirements for yolov5
 COPY yolov5/requirements.txt /yolov5/requirements.txt
-RUN cd /yolov5 && pip3 install -r requirements.txt
+RUN cd /yolov5 && pip3 install -r requirements.txt -i https://pypi.douban.com/simple/
 RUN apt-get update --fix-missing
 RUN apt-get install -y libgl1 libgtk-3-0 libgtk-3-dev
-RUN pip3 install pycocotools
+RUN pip3 install pycocotools -i https://pypi.douban.com/simple/
 
 # install requirements for model conversion
-RUN pip3 install netron
-RUN pip3 install onnx
-RUN pip3 install onnx-simplifier
-RUN pip3 install tensorflow-datasets
-RUN pip3 install openvino2tensorflow==1.17.2
-RUN pip3 install gdown
+RUN pip3 install netron -i https://pypi.douban.com/simple/
+RUN pip3 install onnx -i https://pypi.douban.com/simple/
+RUN pip3 install onnx-simplifier -i https://pypi.douban.com/simple/
+RUN pip3 install tensorflow-datasets -i https://pypi.douban.com/simple/
+RUN pip3 install openvino2tensorflow==1.17.2 -i https://pypi.douban.com/simple/
+RUN pip3 install gdown -i https://pypi.douban.com/simple/
 
 # Add a user that UID:GID will be updated by vscode
 ARG USERNAME=developer
