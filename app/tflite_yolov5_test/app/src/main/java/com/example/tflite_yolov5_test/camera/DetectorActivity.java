@@ -24,6 +24,9 @@ import com.example.tflite_yolov5_test.camera.tracker.MultiBoxTracker;
 import com.example.tflite_yolov5_test.customview.OverlayView;
 import com.example.tflite_yolov5_test.TfliteRunner;
 import com.example.tflite_yolov5_test.TfliteRunMode;
+
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +38,11 @@ public class DetectorActivity extends CameraActivity  {
 
     private static final String TAG = "DetectorActivity";
 
-    private static final int TF_OD_API_INPUT_SIZE = 320;
+    private static int TF_OD_API_INPUT_SIZE = 320;
     private static final boolean TF_OD_API_IS_QUANTIZED = true;
     private static final String TF_OD_API_MODEL_FILE = "detect.tflite";
     private static final String TF_OD_API_LABELS_FILE = "labelmap.txt";
-    private static final TfliteRunMode.Mode MODE = TfliteRunMode.Mode.NONE_INT8;
+    private static TfliteRunMode.Mode MODE = TfliteRunMode.Mode.NONE_INT8;
     // Minimum detection confidence to track a detection.
     private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.5f;
     private static final boolean MAINTAIN_ASPECT = false;
@@ -86,6 +89,10 @@ public class DetectorActivity extends CameraActivity  {
         int inputSize = bundle.getInt("input_size");
         Log.e(TAG,String.format("input size is %d",inputSize));
         Log.e(TAG,String.format("MODE is %s",inMODE.toString()));
+        TF_OD_API_INPUT_SIZE = inputSize;
+        MODE = inMODE;
+        TextView textView_mode = (TextView)findViewById(R.id.textView_mode);
+        textView_mode.setText(String.format("%d %s",inputSize,inMODE.toString()));
         SeekBar conf_seekBar = (SeekBar)findViewById(R.id.conf_seekBar2);
         conf_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
             @Override
