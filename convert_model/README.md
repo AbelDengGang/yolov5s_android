@@ -18,15 +18,63 @@ If docker report can not find GPU, need install nvidia-container-toolkit
 ```
 sudo apt-get install -y nvidia-container-toolkit
 ```
+
+### modify default pip source
+open  /home/developer/.config/pip/pip.conf add:
+```
+[global]
+index-url = http://pypi.douban.com/simple/
+trusted-host = pypi.douban.com
+```
+or run command to set:
+```
+pip config set global.index-url http://pypi.douban.com/simple/
+pip config set global.trusted-host  pypi.douban.com
+```
+Then need install onnxruntime and cormtools in docker container and then commit the container
+```
+/usr/bin/python3 -m pip install --user onnxruntime   -i https://pypi.douban.com/simple/
+/usr/bin/python3 -m pip install --user coremltools   -i https://pypi.douban.com/simple/
+```
+
 ## PyTorch -> ONNX
 Download the pytorch pretrained weights and export to ONNX format.  
+默认情况下，下载最新release的模型。如果要指定模型版本，则修改 yolov5/utils/downloads.py
+```
+diff --git a/utils/downloads.py b/utils/downloads.py
+index 6b2c374..3a65da5 100644
+--- a/utils/downloads.py
++++ b/utils/downloads.py
+@@ -52,7 +52,7 @@ def attempt_download(file, repo='ultralytics/yolov5'):  # from utils.downloads i
+         # GitHub assets
+         file.parent.mkdir(parents=True, exist_ok=True)  # make parent dir (if required)
+         try:
+-            response = requests.get(f'https://api.github.com/repos/{repo}/releases/latest').json()  # github api
++            response = requests.get(f'https://api.github.com/repos/{repo}/releases/v5.0').json()  # github api
+             assets = [x['name'] for x in response['assets']]  # release assets, i.e. ['yolov5s.pt', 'yolov5m.pt', ...]
+             tag = response['tag_name']  # i.e. 'v1.0'
+         except:  # fallback plan
+```
+
 ```sh
+cd workspace
 cd yolov5
 ./data/scripts/download_weights.sh #modify 'python' to 'python3' if needed
 python3 export.py --weights ./yolov5s.pt --img-size 640 640 --simplify
 ```
+after this command , you can get yolov5s.mlmodel
 
 ## ONNX -> OpenVino
+setup openvino
+```
+/opt/intel/openvino_2021.3.394/deployment_tools/model_optimizer/install_prerequisites
+sudo ./install_prerequisites.sh
+```
+add openvino env var  in ~/.bashrc
+```
+source /opt/intel/openvino_2021.3.394/bin/setupvars.sh 
+```
+
 ```sh
 python3 /opt/intel/openvino_2021.3.394/deployment_tools/model_optimizer/mo.py \
  --input_model yolov5s.onnx \
@@ -36,6 +84,13 @@ python3 /opt/intel/openvino_2021.3.394/deployment_tools/model_optimizer/mo.py \
  --output Conv_245,Conv_325,Conv_405
 ```
 You will get `yolov5s.bin  yolov5s.mapping  yolov5s.xml` as OpenVino model.  
+
+在转换时出现问题：
+```
+[ ERROR ]  Exception occurred during running replacer "REPLACEMENT_ID" (<class 'extensions.front.user_data_repack.UserDataRepack'>): No node with name Conv_325
+```
+不知道该如何解决。
+
 If you use the other verion yolov5, you have to check the output layer IDs in netron.  
 The output layers are three most bottom Convolution layers. 
 ```sh
